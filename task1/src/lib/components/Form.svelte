@@ -29,7 +29,7 @@
 	const fetchCaptcha = async () => {
 		// API URL for fetching captcha data
 		const API_URL = 'https://baconipsum.com/api/?type=meat-and-filler';
-		
+
 		try {
 			// Fetch data from the API
 			const response = await fetch(API_URL);
@@ -51,21 +51,27 @@
 		// Call fetchCaptcha to reload the captcha
 		fetchCaptcha();
 	};
-	
+
 	const submitForm = () => {
-		// Check if user input matches the fetched captcha
-		if (formData.userInput === sevenLetterString) {
-			console.log('Captcha is correct. Proceed with form submission.');
-			submissionStatus = true;
-			errorMessage = '';
-			console.log(formData);
-			if (submissionStatus) {
-				goto('/');
+		const isFormValid = Object.values(formData).every((value) => value !== '');
+
+		if (isFormValid) {
+			if (formData.userInput === sevenLetterString) {
+				console.log('Captcha is correct. Proceed with form submission.');
+				submissionStatus = true;
+				errorMessage = '';
+				console.log(formData);
+				if (submissionStatus) {
+					goto('/');
+				}
+			} else {
+				console.log('Captcha is incorrect. Please try again.');
+				submissionStatus = false;
+				errorMessage = 'Mismatch! Enter the correct captcha.';
 			}
 		} else {
-			console.log('Captcha is incorrect. Please try again.');
+			console.log('Please fill in all required fields.');
 			submissionStatus = false;
-			errorMessage = 'Mismatch! Enter the correct captcha.';
 		}
 	};
 </script>
@@ -89,7 +95,6 @@
 				id="lastname"
 				type="text"
 				bind:value={formData.lastname}
-				required
 			></InputField>
 			<SelectField
 				label="Age"
@@ -113,13 +118,11 @@
 				<div class="flex-shrink-0">
 					<p class="text-gray-600 mb-2">Captcha:</p>
 				</div>
-				<!-- Display the 7-letter string -->
 				<div class="flex-grow">
 					<p class="font-bold rounded text-lg text-center mr-2 mb-2 line-through bg-gray-600">
 						{sevenLetterString}
 					</p>
 				</div>
-				<!-- Reload button -->
 				<div>
 					<button
 						type="button"
@@ -130,7 +133,7 @@
 					</button>
 				</div>
 			</div>
-
+			<p class="text-red-500">{errorMessage}</p>
 			<InputField
 				type="text"
 				label="Enter Captcha"
@@ -138,7 +141,6 @@
 				bind:value={formData.userInput}
 				required
 			/>
-
 			<button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
 				Submit
 			</button>
